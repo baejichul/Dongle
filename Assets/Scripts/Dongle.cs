@@ -7,16 +7,21 @@ using UnityEngine;
 
 public class Dongle : MonoBehaviour
 {
-
+    public GameManager _manager;
     public int _level;
     public bool _isDrag;
+    public bool _isMerge;
+
+
     Rigidbody2D _rigid;
+    CircleCollider2D _circleCol;
     Animator _ani;
 
     void Awake()
-    {
+    {   
         _rigid = GetComponent<Rigidbody2D>();
         _ani   = GetComponent<Animator>();
+        _circleCol = GetComponent<CircleCollider2D>();
     }
 
 
@@ -65,5 +70,79 @@ public class Dongle : MonoBehaviour
     {
         _isDrag = false;
         _rigid.simulated = true;
+    }
+
+    public void Hide(Vector3 targetPos)
+    {
+        _isMerge = true;
+        _rigid.simulated = false;
+        _circleCol.enabled = false;
+
+        StartCoroutine(HideRoutine(targetPos));
+    }
+
+    IEnumerator HideRoutine(Vector3 targetPos)
+    {
+        int frameCount = 0;
+        while ( frameCount < 20)
+        {
+            frameCount++;
+            transform.position = Vector3.Lerp(transform.position, targetPos, 1.0f);
+            yield return null;
+        }
+
+        _isMerge = false;
+        gameObject.SetActive(false);
+    }
+
+    void LevelUp()
+    {
+        _isMerge = true;
+        _rigid.velocity = Vector2.zero;
+        _rigid.angularVelocity = 0;
+
+        StartCoroutine(LevelUpRoutine());
+    }
+
+    IEnumerator LevelUpRoutine()
+    {
+        yield return new WaitForSeconds(0.2f);
+
+        _ani.SetInteger("Level", _level + 1);
+        yield return new WaitForSeconds(0.3f);
+        _level++;
+
+        _manager._maxLevel = Mathf.Max(_level, _manager._maxLevel);
+
+        _isMerge = false;
+
+    }
+
+    void OnCollisionStay2D(Collision2D collision)
+    {
+        if (collision.gameObject.tag == "Dongle")
+        {
+            Dongle collisionDongle = collision.gameObject.GetComponent<Dongle>();
+
+            if ( (_level == collisionDongle._level) && (!_isMerge && !collisionDongle._isMerge) && _level < 7 )
+            {
+                // 나와 충돌체 위치 가져오기
+                float tformX = transform.position.x;
+                float tformY = transform.position.y;
+                float collX  = collision.transform.position.x;
+                float collY  = collision.transform.position.y;
+
+                // 1.내가 충돌체보다 아래에 있을때
+                // 2.충돌체와 동일한 높이일때, 내가 오른쪽에 있을때
+                if ( tformY < collY || (tformY == collY && tformX > collX) )
+                {
+                    // 충돌체 숨기기
+                    collisionDongle.Hide(transform.position);
+                    // 나는 레벨업
+                    LevelUp();
+                }
+            }
+
+        }
     }
 }

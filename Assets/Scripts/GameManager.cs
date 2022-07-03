@@ -7,6 +7,7 @@ public class GameManager : MonoBehaviour
     public Dongle _lastDongle;
     public GameObject _donglePrefab;
     public Transform _dongleGroup;
+    public int _maxLevel;
 
     const string DONGLE_NAME = "Dongle";
 
@@ -18,6 +19,7 @@ public class GameManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        _maxLevel = 2;
         NextDongle();
     }
 
@@ -34,7 +36,8 @@ public class GameManager : MonoBehaviour
     {
         Dongle newDongle = GetDongle();
         _lastDongle = newDongle;
-        _lastDongle._level = Random.Range(0, 8);
+        _lastDongle._manager = this;
+        _lastDongle._level = Random.Range(0, _maxLevel);
         _lastDongle.gameObject.SetActive(true);
 
         StartCoroutine("WaitNext");
