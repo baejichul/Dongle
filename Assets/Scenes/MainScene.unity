@@ -948,6 +948,7 @@ MonoBehaviour:
   _lastDongle: {fileID: 0}
   _donglePrefab: {fileID: 7766025467554269527, guid: c3f8c2d06398a914d9768b7c796adf9a, type: 3}
   _dongleGroup: {fileID: 1598860190}
+  _level: 0
 --- !u!4 &1632810448
 Transform:
   m_ObjectHideFlags: 0

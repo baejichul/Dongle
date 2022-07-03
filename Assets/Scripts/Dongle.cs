@@ -7,18 +7,28 @@ using UnityEngine;
 
 public class Dongle : MonoBehaviour
 {
+
+    public int _level;
     public bool _isDrag;
     Rigidbody2D _rigid;
-
+    Animator _ani;
 
     void Awake()
     {
         _rigid = GetComponent<Rigidbody2D>();
+        _ani   = GetComponent<Animator>();
     }
+
+
+    void OnEnable()
+    {
+        _ani.SetInteger("Level", _level);
+    }
+
     // Start is called before the first frame update
     void Start()
     {
-            
+        
     }
 
     // Update is called once per frame
