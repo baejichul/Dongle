@@ -7,9 +7,12 @@ public class GameManager : MonoBehaviour
     public Dongle _lastDongle;
     public GameObject _donglePrefab;
     public Transform _dongleGroup;
+    public GameObject _effectPrefab;
+    public Transform _effectGroup;
     public int _maxLevel;
 
     const string DONGLE_NAME = "Dongle";
+    const string DONGLE_EFFECT_NAME = "Effect";
 
     void Awake()
     {
@@ -25,10 +28,18 @@ public class GameManager : MonoBehaviour
 
     Dongle GetDongle()
     {
+        // 이펙트 생성
+        GameObject instantEff = Instantiate(_effectPrefab, _effectGroup);
+        instantEff.name = DONGLE_EFFECT_NAME;
+        ParticleSystem instantEffect = instantEff.GetComponent<ParticleSystem>();
+
+        // 동글 생성
         GameObject instant = Instantiate(_donglePrefab, _dongleGroup);
         instant.name = DONGLE_NAME;
 
         Dongle instantDongle = instant.GetComponent<Dongle>();
+        instantDongle._effect = instantEffect;
+
         return instantDongle;
     }
 

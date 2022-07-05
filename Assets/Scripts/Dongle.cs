@@ -8,6 +8,7 @@ using UnityEngine;
 public class Dongle : MonoBehaviour
 {
     public GameManager _manager;
+    public ParticleSystem _effect;
     public int _level;
     public bool _isDrag;
     public bool _isMerge;
@@ -109,6 +110,8 @@ public class Dongle : MonoBehaviour
         yield return new WaitForSeconds(0.2f);
 
         _ani.SetInteger("Level", _level + 1);
+        EffectPlay();
+
         yield return new WaitForSeconds(0.3f);
         _level++;
 
@@ -116,6 +119,12 @@ public class Dongle : MonoBehaviour
 
         _isMerge = false;
 
+    }
+    void EffectPlay()
+    {
+        _effect.transform.position = transform.position;
+        _effect.transform.localScale = transform.localScale;
+        _effect.Play();
     }
 
     void OnCollisionStay2D(Collision2D collision)
