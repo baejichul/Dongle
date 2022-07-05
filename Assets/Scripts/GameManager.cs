@@ -9,7 +9,10 @@ public class GameManager : MonoBehaviour
     public Transform _dongleGroup;
     public GameObject _effectPrefab;
     public Transform _effectGroup;
+
+    public int score;
     public int _maxLevel;
+    public bool _isGameOver;
 
     const string DONGLE_NAME = "Dongle";
     const string DONGLE_EFFECT_NAME = "Effect";
@@ -45,6 +48,9 @@ public class GameManager : MonoBehaviour
 
     void NextDongle()
     {
+        if (_isGameOver)
+            return;
+
         Dongle newDongle = GetDongle();
         _lastDongle = newDongle;
         _lastDongle._manager = this;
@@ -79,5 +85,32 @@ public class GameManager : MonoBehaviour
 
         _lastDongle.Drop();
         _lastDongle = null;
+    }
+
+    public void GameOver()
+    {
+        if (_isGameOver)
+        {
+            return;
+        }
+        _isGameOver = true;
+        // Debug.Log("Game Over");
+
+        StartCoroutine("GameOverRoutine");
+    }
+
+    IEnumerator GameOverRoutine()
+    {
+        // 1. 장면 안에 활성화 되어있는 모든 동글 가져오기
+        Dongle[] dongleArr = FindObjectsOfType<Dongle>();
+
+        // 2. 지우기 전에 모든 동글의 물리효과 비활성화
+        // 3. 1번 목록을 하나씩 접근해서 지우기
+        for (int i = 0; i < dongleArr.Length; i++)
+        {
+            dongleArr[i]._rigid.simulated = false;
+            dongleArr[i].Hide(Vector3.up * 100);
+            yield return new WaitForSeconds(0.1f);
+        }
     }
 }

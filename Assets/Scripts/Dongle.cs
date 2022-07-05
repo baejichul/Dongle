@@ -14,12 +14,16 @@ public class Dongle : MonoBehaviour
     public bool _isMerge;
 
 
-    Rigidbody2D _rigid;
+    public Rigidbody2D _rigid;
     CircleCollider2D _circleCol;
     Animator _ani;
+    SpriteRenderer _spr;
+
+    float _deadTime;
 
     void Awake()
-    {   
+    {
+        _spr   = GetComponent<SpriteRenderer>();
         _rigid = GetComponent<Rigidbody2D>();
         _ani   = GetComponent<Animator>();
         _circleCol = GetComponent<CircleCollider2D>();
@@ -79,6 +83,11 @@ public class Dongle : MonoBehaviour
         _rigid.simulated = false;
         _circleCol.enabled = false;
 
+        if (targetPos == Vector3.up * 100)
+        {
+            EffectPlay();
+        }
+
         StartCoroutine(HideRoutine(targetPos));
     }
 
@@ -88,10 +97,20 @@ public class Dongle : MonoBehaviour
         while ( frameCount < 20)
         {
             frameCount++;
-            transform.position = Vector3.Lerp(transform.position, targetPos, 1.0f);
+
+            if (targetPos != Vector3.up * 100)
+            {
+                transform.position = Vector3.Lerp(transform.position, targetPos, 1.0f);
+            }
+            else if (targetPos == Vector3.up * 100)
+            {
+                transform.localScale = Vector3.Lerp(transform.localScale, Vector3.zero, 0.2f);
+            }
+            
             yield return null;
         }
 
+        _manager.score += (int) Mathf.Pow(2, _level);
         _isMerge = false;
         gameObject.SetActive(false);
     }
@@ -125,6 +144,33 @@ public class Dongle : MonoBehaviour
         _effect.transform.position = transform.position;
         _effect.transform.localScale = transform.localScale;
         _effect.Play();
+    }
+
+    void OnTriggerStay2D(Collider2D collision)
+    {
+        if(collision.tag == "Finish")
+        {
+            _deadTime += Time.deltaTime;
+
+            if (_deadTime > 2.0f)
+            {
+                _spr.color = new Color(0.9f, 0.2f, 0.2f);
+            }
+            
+            if (_deadTime > 5.0f)
+            {
+                _manager.GameOver();
+            }
+        }    
+    }
+
+    void OnTriggerExit2D(Collider2D collision)
+    {
+        if (collision.tag == "Finish")
+        {
+            _deadTime = 0;
+            _spr.color = Color.white;
+        }
     }
 
     void OnCollisionStay2D(Collision2D collision)

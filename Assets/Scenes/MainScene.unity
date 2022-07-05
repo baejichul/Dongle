@@ -818,7 +818,7 @@ GameObject:
   - component: {fileID: 919000789}
   m_Layer: 0
   m_Name: Line
-  m_TagString: Untagged
+  m_TagString: Finish
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -981,6 +981,7 @@ MonoBehaviour:
   _dongleGroup: {fileID: 1598860190}
   _effectPrefab: {fileID: 8222327353411343305, guid: c349e90e3eef59e41b791207fa8f7d29, type: 3}
   _effectGroup: {fileID: 512348421}
+  score: 0
   _maxLevel: 0
 --- !u!4 &1632810448
 Transform:
