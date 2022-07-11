@@ -12,6 +12,7 @@ public class Dongle : MonoBehaviour
     public int _level;
     public bool _isDrag;
     public bool _isMerge;
+    public bool _isAttach;
 
 
     public Rigidbody2D _rigid;
@@ -33,6 +34,26 @@ public class Dongle : MonoBehaviour
     void OnEnable()
     {
         _ani.SetInteger("Level", _level);
+    }
+
+    void OnDisable()
+    {
+        // 동글 속성 초기화
+        _level    = 0;
+        _isDrag   = false;
+        _isMerge  = false;
+        _isAttach = false;
+
+        // 동글 트랜스폼 초기화
+        transform.localPosition = Vector3.zero;
+        transform.localRotation = Quaternion.identity;
+        transform.localScale    = Vector3.zero;
+
+        // 동글 물리 초기화
+        _rigid.simulated = false;
+        _rigid.velocity = Vector2.zero;
+        _rigid.angularVelocity = 0;
+        _circleCol.enabled = true;
     }
 
     // Start is called before the first frame update
@@ -110,7 +131,7 @@ public class Dongle : MonoBehaviour
             yield return null;
         }
 
-        _manager.score += (int) Mathf.Pow(2, _level);
+        _manager._score += (int) Mathf.Pow(2, _level);
         _isMerge = false;
         gameObject.SetActive(false);
     }
@@ -130,6 +151,7 @@ public class Dongle : MonoBehaviour
 
         _ani.SetInteger("Level", _level + 1);
         EffectPlay();
+        _manager.SfxPlay(GameManager.SFX.LEVELUP);
 
         yield return new WaitForSeconds(0.3f);
         _level++;
@@ -146,6 +168,21 @@ public class Dongle : MonoBehaviour
         _effect.Play();
     }
 
+    IEnumerator AttachRoutine()
+    {
+        if (_isAttach)
+        {
+            yield break;
+        }
+
+        _isAttach = true;
+        _manager.SfxPlay(GameManager.SFX.ATTACH);
+
+        yield return new WaitForSeconds(0.2f);
+        _isAttach = false;
+    }
+
+#region ON_EVENT
     void OnTriggerStay2D(Collider2D collision)
     {
         if(collision.tag == "Finish")
@@ -173,6 +210,11 @@ public class Dongle : MonoBehaviour
         }
     }
 
+    void OnCollisionEnter2D(Collision2D collision)
+    {
+        // _manager.SfxPlay(GameManager.SFX.ATTACH);
+        StartCoroutine("AttachRoutine");
+    }
     void OnCollisionStay2D(Collision2D collision)
     {
         if (collision.gameObject.tag == "Dongle")
@@ -200,4 +242,6 @@ public class Dongle : MonoBehaviour
 
         }
     }
+#endregion
+
 }
